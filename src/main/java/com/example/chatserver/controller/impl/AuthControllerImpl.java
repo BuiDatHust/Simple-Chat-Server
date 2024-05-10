@@ -9,9 +9,5 @@ import com.example.chatserver.controller.AuthController;
 @RestController
 @RequestMapping("/auth")
 public class AuthControllerImpl implements AuthController {
-    @PostMapping("/register")
 
-    @PostMapping("/login")
-
-    @PostMapping("/logout")
 }

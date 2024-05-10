@@ -3,12 +3,14 @@ package com.example.chatserver.entity;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Set;
 
 @Data
 @Entity
+@NoArgsConstructor
 @Table(name = "user_chat")
 public class User implements Serializable {
     @Id
