@@ -35,7 +35,7 @@ public class ChatMember {
 
     @Column(name="created_date")
     @Nonnull
-    private Integer createdDate;
+    private Long createdDate;
 
     @OneToOne(mappedBy = "chatMember")
     private ChatMemberSetting chatMemberSetting;

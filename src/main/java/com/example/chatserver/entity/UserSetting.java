@@ -1,6 +1,6 @@
 package com.example.chatserver.entity;
 
-import com.example.chatserver.entity.enums.UiMode;
+import com.example.chatserver.entity.enums.UiModeEnum;
 
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.CascadeType;
@@ -30,9 +30,9 @@ public class UserSetting {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "ui_mode")
-    private UiMode uiMode;
+    private UiModeEnum uiMode;
 
     @Column(name = "created_date")
     @Nonnull
-    private Integer createdDate;
+    private Long createdDate;
 }

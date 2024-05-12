@@ -2,16 +2,22 @@ package com.example.chatserver.entity;
 
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Set;
 
+import com.example.chatserver.entity.enums.UserChatStatusEnum;
+
 @Data
 @Entity
-@NoArgsConstructor
 @Table(name = "user_chat")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,10 +31,8 @@ public class User implements Serializable {
     @Nonnull
     private String countryCode;
 
-    @Nonnull
     private String fullname;
 
-    @Nonnull
     private String username;
 
     private String avatar;
@@ -40,14 +44,15 @@ public class User implements Serializable {
     private String address;
 
     @Column(name = "last_active_at")
-    private Integer lastActiveAt;
+    private Long lastActiveAt;
 
-    @Column(name = "is_active")
-    private Boolean isActive;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private UserChatStatusEnum status;
 
     @Column(name = "created_date")
     @Nonnull
-    private Integer createdDate;
+    private Long createdDate;
 
     @OneToMany(mappedBy="user")
     private Set<ChatMember> chatMembers;

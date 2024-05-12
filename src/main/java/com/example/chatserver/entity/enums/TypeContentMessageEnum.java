@@ -1,6 +1,6 @@
 package com.example.chatserver.entity.enums;
 
-public enum TypeContentMessage {
+public enum TypeContentMessageEnum {
     TEXT,
     IMAGE,
     AUDIO,

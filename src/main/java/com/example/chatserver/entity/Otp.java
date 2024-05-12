@@ -1,6 +1,6 @@
 package com.example.chatserver.entity;
 
-import com.example.chatserver.entity.enums.TypeOtp;
+import com.example.chatserver.entity.enums.TypeOtpEnum;
 
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.Column;
@@ -11,13 +11,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
+@Builder
 @Entity
 @Table(name = "otp")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Otp {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +30,7 @@ public class Otp {
     @Column(name = "type_otp")
     @Nonnull
     @Enumerated(EnumType.STRING)
-    private TypeOtp typeOtp;
+    private TypeOtpEnum typeOtp;
 
     @Column(name = "is_active")
     private boolean isActive;
@@ -34,11 +38,15 @@ public class Otp {
     @Nonnull
     private String value;
 
+    @Column(name = "phone_number")
+    @Nonnull
+    private String phoneNumber;
+
     @Column(name = "expire_at")
     @Nonnull
-    private Integer expireAt; 
+    private Long expireAt; 
 
     @Column(name = "created_date")
     @Nonnull
-    private Integer createdDate;
+    private Long createdDate;
 }

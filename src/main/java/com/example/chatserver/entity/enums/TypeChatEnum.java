@@ -1,6 +1,6 @@
 package com.example.chatserver.entity.enums;
 
-public enum TypeChat {
+public enum TypeChatEnum {
     PAIR,
     GROUP,
     SYSTEM

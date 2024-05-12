@@ -1,7 +1,7 @@
 package com.example.chatserver.entity.enums;
 
-public enum TypeOtp {
+public enum TypeOtpEnum {
     REGISTER,
     LOGIN,
-    LOGIN_NEW_DEVICE
+    LOGIN_NEW_DEVICE;
 }

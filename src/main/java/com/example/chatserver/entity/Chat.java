@@ -2,7 +2,7 @@ package com.example.chatserver.entity;
 
 import java.util.Set;
 
-import com.example.chatserver.entity.enums.TypeChat;
+import com.example.chatserver.entity.enums.TypeChatEnum;
 
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.Column;
@@ -33,7 +33,7 @@ public class Chat {
     @Column(name="type_chat",nullable = false)
     @Enumerated(EnumType.STRING)
     @Nonnull
-    private TypeChat typeChat;
+    private TypeChatEnum typeChat;
 
     private String description;
 
@@ -42,11 +42,11 @@ public class Chat {
     private Integer maxMember;
 
     @Column(name="last_message_at")
-    private Integer lastMessageAt;
+    private Long lastMessageAt;
 
     @Column(name="created_date")
     @Nonnull
-    private Integer createdDate;
+    private Long createdDate;
 
     @OneToMany(mappedBy="chat")
     private Set<ChatMember> chatMembers;

@@ -29,5 +29,5 @@ public class MessageSent {
 
     @Column(name = "created_date")
     @Nonnull
-    private Integer createdDate;
+    private Long createdDate;
 }

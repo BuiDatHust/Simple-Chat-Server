@@ -2,7 +2,7 @@ package com.example.chatserver.entity;
 
 import java.util.Set;
 
-import com.example.chatserver.entity.enums.TypeContentMessage;
+import com.example.chatserver.entity.enums.TypeContentMessageEnum;
 
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.Column;
@@ -31,7 +31,7 @@ public class Message {
     
     @Column(name = "content_type")
     @Enumerated(EnumType.STRING)
-    private TypeContentMessage contentType;
+    private TypeContentMessageEnum contentType;
 
     @Column(name = "is_sent")
     private boolean isSent;
@@ -52,11 +52,11 @@ public class Message {
 
     @Column(name = "created_date")
     @Nonnull
-    private Integer createdDate;
+    private Long createdDate;
 
     @Column(name = "updated_date")
     @Nonnull
-    private Integer updatedDate;
+    private Long updatedDate;
 
     @OneToMany(mappedBy="message")
     private Set<MessageSent> messageSents;

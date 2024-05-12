@@ -1,6 +1,6 @@
 package com.example.chatserver.entity.enums;
 
-public enum UiMode {
+public enum UiModeEnum {
     DARK,
     WHITE
 }
