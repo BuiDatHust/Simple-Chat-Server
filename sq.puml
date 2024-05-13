@@ -1,0 +1,143 @@
+@startuml
+
+' Reference:
+' https://plantuml.com/sequence-diagram
+' https://plantuml-documentation.readthedocs.io/en/latest/formatting/all-skin-params.html
+'
+' Author: datbt9
+' Date: 13/05/2024
+' Jira: http://10.254.136.35:8090/pages/resumedraft.action?draftId=65714137&draftShareId=58ce2748-b779-45e3-9a12-a3720325b42c&
+
+skinparam shadowing false
+skinparam responseMessageBelowArrow false
+
+skinparam DefaultFontColor #222
+skinparam TitleFontSize 25
+
+skinparam NoteBorderColor #teal
+skinparam NoteBackgroundColor #powderblue
+skinparam NoteFontColor #444
+
+skinparam DatabaseBorderColor #teal
+skinparam DatabaseBackgroundColor #bisque
+
+skinparam sequence {
+  ParticipantBorderThickness 1
+  ParticipantBorderColor #teal
+  ParticipantBackgroundColor #teal
+  ParticipantFontColor #white
+  ParticipantFontSize 14
+  ParticipantFontStyle bold
+
+  LifeLineBorderColor #teal
+  LifeLineBackgroundColor #aliceblue
+
+  ArrowColor #teal
+  ActorBorderColor #teal
+
+  GroupBorderThickness 1
+  GroupBorderColor #teal
+  GroupHeaderFontColor #white
+  GroupBackgroundColor #teal
+  GroupFontColor #teal
+
+
+  ReferenceBorderThickness 1
+  ReferenceBorderColor #teal
+  ReferenceBackgroundColor #aliceblue
+  ReferenceHeaderBackgroundColor #white
+  ReferenceFontColor #teal
+}
+
+header : datbt9
+title : [API] Nhận yeu cau lay thong tin khach hang 
+autonumber
+
+participant "Partner" as partner
+participant "Inv SPI" as spi
+participant "Inv CustomerInfo" as cust
+participant "Inv Config" as config
+participant "Customer Service" as custservice
+participant "Customer EKyc Service" as custekycservice
+database "Inv Cust DB" as custdb
+database "Inv Config DB" as configdb
+
+partner++
+spi++
+
+partner -> spi: Gửi yeu cau 
+spi --> spi: Validate dữ liệu truyen vao
+
+alt Khong thoa man
+    spi-->partner: Tra ve loi
+end 
+
+spi->cust:  Gui yeu cau lay thong tin khach hang
+
+cust->config: Lay thong tin co dich vu
+cust++
+config++
+config-->configdb: Lay ban ghi co dich vu
+configdb++
+configdb-->config
+configdb--
+config-->cust: 
+config--
+cust-->cust: kiem tra co dich vu
+alt Co dich vu off:
+    cust-->spi: 
+    spi-->partner: Tra ve loi
+end
+
+cust->custdb: Lay thong tin chia se ho so khach hang
+custdb++
+custdb-->cust:
+custdb--
+cust-->cust: Kiem tra trang thai chia se ho so
+alt Chua chia se ho so:
+    cust-->spi:
+    spi-->partner: Tra ve loi
+end 
+cust->custdb: Lay thong tin tai khoan khach hang da tao o doi tac
+custdb-->cust: 
+cust-->cust: Kiem tra tai khoan khach hang
+alt Ton tai va trang thai = 0:
+    cust-->spi
+    spi-->partner: Tra thanh cong
+end
+cust->custservice: Lay thong tin khach hang
+custservice-->cust
+cust-->cust: Kiem tra dieu kien tai khoan
+alt Tai khoan khong hop le [chua break]:
+    cust-->spi
+    spi-->partner: Tra ve loi
+end
+cust->custekycservice: Lay thong tin ekyc khach hang
+custekycservice-->cust:
+cust-->cust: Kiem tra thong tin ekyc
+alt Hop le:
+    cust-->spi:
+    spi-->partner: Tra ve loi
+end
+cust->custdb: Cap nhat thong tin ekyc cua khach hang
+custdb-->cust:
+cust-->spi:
+spi-->partner: Tra ve thanh cong
+
+cust--
+
+spi--
+partner--
+@enduml
+
+
+
+
+
+
+
+
+
+
+
+
