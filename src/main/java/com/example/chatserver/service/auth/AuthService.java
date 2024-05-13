@@ -8,6 +8,4 @@ import org.springframework.stereotype.Service;
 @Service
 public interface AuthService {
     RegisterByPhoneResponseDto registerByPhone(RegisterByPhoneRequestDto registerByPhone);
-
-    void onboard(OnboardRequestDto registerRequest);
 }

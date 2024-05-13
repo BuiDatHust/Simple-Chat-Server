@@ -13,4 +13,5 @@ public interface ResponseStatusCodeEnum {
     ResponseStatusCode OTP_NOT_MATCH = ResponseStatusCode.builder().code("BS9").httpCode(400).build();
     ResponseStatusCode USER_NOT_EXIST = ResponseStatusCode.builder().code("BS10").httpCode(400).build();
     ResponseStatusCode USER_IS_NOT_PENDING_OTP = ResponseStatusCode.builder().code("BS11").httpCode(400).build();
+    ResponseStatusCode USER_IS_NOT_PENDING_ONBOARD = ResponseStatusCode.builder().code("BS12").httpCode(400).build();
 }

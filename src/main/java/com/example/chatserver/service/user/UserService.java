@@ -1,5 +1,8 @@
 package com.example.chatserver.service.user;
 
-public interface UserService {
+import com.example.chatserver.service.user.dto.request.OnboardingRequestDto;
+import com.example.chatserver.service.user.dto.response.OnboardingResponseDto;
 
+public interface UserService {
+    OnboardingResponseDto onboard(OnboardingRequestDto onboardingRequestDto);
 }

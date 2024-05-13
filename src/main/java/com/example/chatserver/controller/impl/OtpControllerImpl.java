@@ -12,11 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.chatserver.controller.OtpOperation;
-import com.example.chatserver.entity.enums.TypeOtpEnum;
-import com.example.chatserver.exception.BaseException;
 import com.example.chatserver.helper.response.GeneralResponse;
 import com.example.chatserver.helper.response.ResponseFactory;
-import com.example.chatserver.helper.response.ResponseStatusCodeEnum;
 import com.example.chatserver.service.otp.OtpService;
 import com.example.chatserver.service.otp.dto.request.CheckOtpRequestDto;
 

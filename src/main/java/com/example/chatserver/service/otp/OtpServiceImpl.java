@@ -5,7 +5,6 @@ import java.util.Objects;
 
 import com.example.chatserver.service.otp.dto.request.ResendOtpRequestDto;
 import com.example.chatserver.service.otp.dto.response.CheckOtpResponseDto;
-import com.example.chatserver.service.otp.dto.response.ResendOtpResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

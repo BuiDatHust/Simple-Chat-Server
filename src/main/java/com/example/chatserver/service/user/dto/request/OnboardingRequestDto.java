@@ -1,19 +1,19 @@
 package com.example.chatserver.service.user.dto.request;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
 public class OnboardingRequestDto {
-    @NotNull
+    @NotBlank
     private String phoneNumber;
 
-    @NotNull
+    @NotBlank
     private String countryCode;
 
-    @NotNull
+    @NotBlank
     private String fullname;
 
-    @NotNull
+    @NotBlank
     private String username;
 }

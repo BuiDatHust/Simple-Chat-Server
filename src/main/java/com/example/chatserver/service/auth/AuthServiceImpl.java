@@ -62,9 +62,4 @@ public class AuthServiceImpl implements AuthService {
         otpService.sendOtp(sendOtpRequestDto);
         return new RegisterByPhoneResponseDto();
     }
-
-    @Override
-    public void onboard(OnboardRequestDto registerRequest) {
-        
-    }
 }
