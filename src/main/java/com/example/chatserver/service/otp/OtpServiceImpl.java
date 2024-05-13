@@ -1,7 +1,11 @@
 package com.example.chatserver.service.otp;
 
 import java.util.Date;
+import java.util.Objects;
 
+import com.example.chatserver.service.otp.dto.request.ResendOtpRequestDto;
+import com.example.chatserver.service.otp.dto.response.CheckOtpResponseDto;
+import com.example.chatserver.service.otp.dto.response.ResendOtpResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,8 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class OtpServiceImpl implements OtpService {
-    @Autowired
-    private OtpRepository otpRepository;
+    private final OtpRepository otpRepository; ;
     
     @Autowired
     private SmsFramework twilioFramework;
@@ -33,8 +36,12 @@ public class OtpServiceImpl implements OtpService {
     @Autowired
     private UserRepository userRepository;
 
-    // @Value("#{otp.expire-time}")
-    private Integer otpExpireTime=333;
+    @Value("${otp.expire-time}")
+    private Integer otpExpireTime;
+
+    public OtpServiceImpl(OtpRepository otpRepository) {
+        this.otpRepository = otpRepository;
+    }
 
     @Override
     public void sendOtp(SendOtpRequestDto sendOtpRequestDto) {
@@ -53,19 +60,40 @@ public class OtpServiceImpl implements OtpService {
             .createdDate(new Date().getTime())
             .build();
         otpRepository.save(otp);
-        otpRepository.inActiveAllOldOtp(sendOtpRequestDto.getTypeOtp().toString(), sendOtpRequestDto.getRecipent());
+//        otpRepository.inActiveAllOldOtp(sendOtpRequestDto.getTypeOtp().toString(), sendOtpRequestDto.getRecipent());
         twilioFramework.sendSms("admin", sendOtpRequestDto.getRecipent(), sendOtpRequestDto.getBody());
     }
 
     @Override
-    public boolean checkOtp(CheckOtpRequestDto checkOtpRequestDto) {
+    public CheckOtpResponseDto checkOtp(CheckOtpRequestDto checkOtpRequestDto) {
         Long currentTime = new Date().getTime();
         boolean result = false;
-        if(checkOtpRequestDto.getTypeOtp()==TypeOtpEnum.REGISTER.toString()){
+        if(Objects.equals(checkOtpRequestDto.getTypeOtp(), TypeOtpEnum.REGISTER.toString())){
             result = handleCheckOtpRegister(checkOtpRequestDto, currentTime);
         }
         
-        return result;
+        return CheckOtpResponseDto.builder().isVerified(result).build();
+    }
+
+    @Override
+    public void resendOtp(ResendOtpRequestDto resendOtpRequestDto) {
+        if(Objects.equals(resendOtpRequestDto.getTypeOtp(), TypeOtpEnum.REGISTER.toString())){
+            handleResendRegisterOtp(resendOtpRequestDto);
+        }
+    }
+
+    private void handleResendRegisterOtp(ResendOtpRequestDto resendOtpRequestDto) {
+        User user = userRepository.findOneByPhoneNumber(resendOtpRequestDto.getPhoneNumber());
+        if(Objects.isNull(user) || user.getStatus()!=UserChatStatusEnum.PENDING_OTP){
+            throw new BaseException(ResponseStatusCodeEnum.USER_IS_NOT_PENDING_OTP);
+        }
+
+        SendOtpRequestDto sendOtpRequestDto = SendOtpRequestDto.builder()
+                .typeOtp(TypeOtpEnum.REGISTER)
+                .recipent(resendOtpRequestDto.getPhoneNumber())
+                .body(twilioFramework.getTemplateSms(TypeOtpEnum.REGISTER))
+                .build();
+        sendOtp(sendOtpRequestDto);
     }
 
     private boolean handleCheckOtpRegister(CheckOtpRequestDto checkOtpRequestDto, Long currentTime){
@@ -73,7 +101,7 @@ public class OtpServiceImpl implements OtpService {
         if(existedUser==null) {
             throw new BaseException(ResponseStatusCodeEnum.USER_NOT_EXIST);
         }
-        if(existedUser.getStatus()!=UserChatStatusEnum.PENDING_ONBOARDING){
+        if(existedUser.getStatus()!=UserChatStatusEnum.PENDING_OTP){
             throw new BaseException(ResponseStatusCodeEnum.USER_IS_NOT_PENDING_OTP);
         }
 
@@ -81,7 +109,7 @@ public class OtpServiceImpl implements OtpService {
         if(existedOtp==null) {
             throw new BaseException(ResponseStatusCodeEnum.OTP_NOT_MATCH);
         }
-        if(existedOtp.getExpireAt() <=currentTime) {
+        if(existedOtp.getExpireAt()<=currentTime) {
             throw new BaseException(ResponseStatusCodeEnum.OTP_EXPIRED);
         }
 

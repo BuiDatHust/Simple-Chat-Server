@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.validation.constraints.Null;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,10 +30,13 @@ public class GlobalErrorHandler
     @ResponseStatus  
     @ResponseBody  
     @ExceptionHandler(BaseException.class)  
-    public ResponseEntity<GeneralResponse<Null>> handleException(BaseException ex){  
+    public ResponseEntity<GeneralResponse<Object>> handleException(BaseException ex){
         log.info("{}", ex);
+        if(ex.getDataResponse()==null){
+            return responseFactory.fail( ex.getDataResponse(), ex.getResponseStatusCode());
+        }
         return responseFactory.fail(ex.getResponseStatusCode()); 
-   }  
+   }
 
    @ExceptionHandler(MethodArgumentNotValidException.class) 
 	public ResponseEntity<?> notValid(MethodArgumentNotValidException ex, HttpServletRequest request) {

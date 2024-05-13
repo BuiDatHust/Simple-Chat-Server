@@ -1,21 +1,16 @@
 package com.example.chatserver.service.otp.dto.request;
 
-
 import com.example.chatserver.entity.enums.TypeOtpEnum;
-
+import com.example.chatserver.validation.EnumValidator;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
-public class SendOtpRequestDto {
+public class ResendOtpRequestDto {
     @NotNull
-    private String recipent;
+    private String phoneNumber;
 
     @NotNull
-    private String body;
-
-    @NotNull 
-    private TypeOtpEnum typeOtp;
+    @EnumValidator(enumClazz = TypeOtpEnum.class)
+    private String typeOtp;
 }

@@ -11,12 +11,10 @@ import com.example.chatserver.entity.enums.UserChatStatusEnum;
 import com.example.chatserver.exception.BaseException;
 import com.example.chatserver.framework.impl.TwilioFrameworkImpl;
 import com.example.chatserver.helper.PhoneHelper;
-import com.example.chatserver.helper.response.ResponseFactory;
 import com.example.chatserver.helper.response.ResponseStatusCodeEnum;
 import com.example.chatserver.repository.UserRepository;
 import com.example.chatserver.service.auth.dto.request.RegisterByPhoneRequestDto;
 import com.example.chatserver.service.auth.dto.response.RegisterByPhoneResponseDto;
-import com.example.chatserver.service.auth.dto.request.OnboardRequestDto;
 import com.example.chatserver.service.otp.OtpService;
 import com.example.chatserver.service.otp.dto.request.SendOtpRequestDto;
 

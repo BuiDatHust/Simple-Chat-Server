@@ -33,6 +33,11 @@ public class User implements Serializable {
 
     private String fullname;
 
+    @Column(name = "status")
+    @Nonnull
+    @Enumerated(EnumType.STRING)
+    private UserChatStatusEnum status;
+
     private String username;
 
     private String avatar;
@@ -45,10 +50,6 @@ public class User implements Serializable {
 
     @Column(name = "last_active_at")
     private Long lastActiveAt;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status")
-    private UserChatStatusEnum status;
 
     @Column(name = "created_date")
     @Nonnull

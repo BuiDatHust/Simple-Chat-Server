@@ -1,10 +1,13 @@
 package com.example.chatserver.controller.impl;
 
-import javax.validation.Valid;
-
+import com.example.chatserver.service.otp.dto.request.ResendOtpRequestDto;
+import com.example.chatserver.service.otp.dto.response.CheckOtpResponseDto;
+import com.example.chatserver.service.otp.dto.response.ResendOtpResponseDto;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,11 +31,14 @@ public class OtpControllerImpl implements OtpOperation {
 
     @Override
     @PostMapping("/verify")
-    public ResponseEntity<GeneralResponse<Boolean>> verifyOtp(@Valid CheckOtpRequestDto checkOtpRequestDto) {
-        TypeOtpEnum otpEnum = TypeOtpEnum.valueOf(checkOtpRequestDto.getTypeOtp());
-        if(otpEnum==null) {
-            throw new BaseException(ResponseStatusCodeEnum.BUSINESS_ERROR);
-        }
+    public ResponseEntity<GeneralResponse<CheckOtpResponseDto>> verifyOtp(@Valid @RequestBody CheckOtpRequestDto checkOtpRequestDto) {
         return responseFactory.success(otpService.checkOtp(checkOtpRequestDto));
+    }
+
+    @Override
+    @PostMapping("/resend")
+    public ResponseEntity<GeneralResponse<ResendOtpResponseDto>> resendOtp(@Valid @RequestBody ResendOtpRequestDto resendOtpRequestDto) {
+        otpService.resendOtp(resendOtpRequestDto);
+        return responseFactory.success(new ResendOtpResponseDto());
     }
 }

@@ -5,8 +5,6 @@ import com.example.chatserver.service.auth.dto.response.RegisterByPhoneResponseD
 
 import org.springframework.stereotype.Service;
 
-import com.example.chatserver.service.auth.dto.request.OnboardRequestDto;
-
 @Service
 public interface AuthService {
     RegisterByPhoneResponseDto registerByPhone(RegisterByPhoneRequestDto registerByPhone);

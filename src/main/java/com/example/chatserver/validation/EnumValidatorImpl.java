@@ -1,9 +1,9 @@
 package com.example.chatserver.validation;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 
 public class EnumValidatorImpl implements ConstraintValidator<EnumValidator, String> {
 
@@ -26,5 +26,4 @@ public class EnumValidatorImpl implements ConstraintValidator<EnumValidator, Str
             valueList.add(enumVal.toString().toUpperCase());
         }
     }
-
 }

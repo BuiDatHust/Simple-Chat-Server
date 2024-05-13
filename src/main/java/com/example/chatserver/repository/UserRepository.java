@@ -8,11 +8,11 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    @Query(value = "select u from User u where u.phoneNumber=:phoneNumber order by u.id limit 1")
+    @Query(value = "select u from User u where u.phoneNumber=?1 order by u.id limit 1")
     User findOneByPhoneNumber(String phoneNumber);
 
     User findOneByUsername(String username);
 
-    @Query(value = "select u from User u where u.phoneNumber=:phoneNumber and status=:status order by u.id limit 1")
+    @Query(value = "select u from User u where u.phoneNumber=?1 and u.status=?2 order by u.id limit 1")
     User findOneByPhoneNumberAndStatus(String phoneNumber, String status);
 }

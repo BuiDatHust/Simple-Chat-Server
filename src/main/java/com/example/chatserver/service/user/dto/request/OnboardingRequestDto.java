@@ -1,11 +1,10 @@
-package com.example.chatserver.service.auth.dto.request;
+package com.example.chatserver.service.user.dto.request;
 
-import javax.validation.constraints.NotNull;
-
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class OnboardRequestDto {
+public class OnboardingRequestDto {
     @NotNull
     private String phoneNumber;
 
