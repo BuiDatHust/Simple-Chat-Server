@@ -31,6 +31,18 @@ services:
     networks:
       - postgres
     restart: unless-stopped
+  redis:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    volumes: 
+      - redis:/data/redis
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379   
+      REDIS_PASSWORD: eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
 
 networks:
   postgres:
@@ -39,3 +51,5 @@ networks:
 volumes:
   postgres:
   pgadmin:
+  redis:
+    driver: local

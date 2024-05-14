@@ -31,7 +31,8 @@ public class LoginDevice {
     private String location;
 
     @Column(name = "status")
-    @EnumValidator(enumClazz = LoginDeviceStatusEnum.class)
+    @Nonnull
+    @Enumerated(EnumType.STRING)
     private LoginDeviceStatusEnum status;
 
     @Column(name = "created_date")

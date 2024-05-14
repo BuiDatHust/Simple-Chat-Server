@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS login_device (
 
 CREATE TABLE IF NOT EXISTS refresh_token (
     id BIGSERIAL PRIMARY KEY,
-    login_device_id BIGSERIAL PRIMARY KEY,
+    login_device_id BIGINT NOT NULL,
     value VARCHAR NOT NULL,
     is_active BOOLEAN NOT NULL,
     expire_time BIGINT NOT NULL,
