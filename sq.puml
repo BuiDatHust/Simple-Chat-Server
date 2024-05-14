@@ -50,94 +50,98 @@ skinparam sequence {
 }
 
 header : datbt9
-title : [API] Nhận yeu cau lay thong tin khach hang 
+title : [DD] Luồng Nhận yêu cầu lấy thông tin khách hàng
 autonumber
 
 participant "Partner" as partner
 participant "Inv SPI" as spi
 participant "Inv CustomerInfo" as cust
 participant "Inv Config" as config
+participant "Inv Transaction" as trans
 participant "Customer Service" as custservice
 participant "Customer EKyc Service" as custekycservice
 database "Inv Cust DB" as custdb
 database "Inv Config DB" as configdb
+database "Inv Trans DB" as transdb
 
 partner++
 spi++
 
-partner -> spi: Gửi yeu cau 
-spi --> spi: Validate dữ liệu truyen vao
+partner -> spi: Gửi yêu cầu
+spi --> spi: Validate dữ liệu truyền vào
 
-alt Khong thoa man
-    spi-->partner: Tra ve loi
-end 
+alt Không thoả mãn
+    spi-->partner: Trả về lỗi
+end
 
-spi->cust:  Gui yeu cau lay thong tin khach hang
-
-cust->config: Lay thong tin co dich vu
+spi->cust:  Gửi yêu cầu lấy thông tin khách hàng
 cust++
+cust->config: Lấy thông tin cờ dịch vụ
 config++
-config-->configdb: Lay ban ghi co dich vu
+config->configdb: Lấy cấu hình cờ dịch vụ
 configdb++
 configdb-->config
 configdb--
-config-->cust: 
+config-->cust:
 config--
-cust-->cust: kiem tra co dich vu
-alt Co dich vu off:
-    cust-->spi: 
-    spi-->partner: Tra ve loi
+cust-->cust: Kiểm tra cờ dịch vụ
+alt Cờ dịch vụ off:
+    cust-->spi:
+    spi-->partner: Trả về lỗi
 end
 
-cust->custdb: Lay thong tin chia se ho so khach hang
+cust->custdb: Lấy thông tin chia sẻ hồ sơ khách hàng
 custdb++
 custdb-->cust:
 custdb--
-cust-->cust: Kiem tra trang thai chia se ho so
-alt Chua chia se ho so:
-    cust-->spi:
-    spi-->partner: Tra ve loi
-end 
-cust->custdb: Lay thong tin tai khoan khach hang da tao o doi tac
-custdb-->cust: 
-cust-->cust: Kiem tra tai khoan khach hang
-alt Ton tai va trang thai = 0:
-    cust-->spi
-    spi-->partner: Tra thanh cong
-end
-cust->custservice: Lay thong tin khach hang
-custservice-->cust
-cust-->cust: Kiem tra dieu kien tai khoan
-alt Tai khoan khong hop le [chua break]:
-    cust-->spi
-    spi-->partner: Tra ve loi
-end
-cust->custekycservice: Lay thong tin ekyc khach hang
-custekycservice-->cust:
-cust-->cust: Kiem tra thong tin ekyc
-alt Hop le:
+cust-->cust: Kiểm tra trạng thái chia sẻ hồ sơ
+alt Chưa chia sẻ hồ sơ
     cust-->spi:
     spi-->partner: Tra ve loi
 end
-cust->custdb: Cap nhat thong tin ekyc cua khach hang
+cust->custdb: Lấy thông tin tài khoản khách hàng đã được đồng bộ từ đối tác
+custdb++
 custdb-->cust:
+custdb--
+cust-->cust: Kiểm tra tài khoản khách hàng
+alt Không tồn tại  hoặc \n tồn tại nhưng trạng thai khác 0
+    cust->custservice: Lấy thông tin khách hàng
+    custservice++
+    custservice-->cust
+    custservice--
+    cust-->cust: Kiểm tra điều kiện tài khoản
+    alt Tai khoan có nguồn tiền VTP không hoạt động
+        cust-->spi
+        spi-->partner: Trả về lỗi
+    end
+end
+
+cust->custekycservice: Lấy thông tin ekyc
+custekycservice++
+custekycservice-->cust:
+custekycservice--
+cust-->cust: Kiểm tra thông tin ekyc
+alt Không đủ 3 ảnh hoặc\n loại giấy tờ không hợp lệ
+    cust-->spi:
+    spi-->partner: Trả về lỗi
+end
+cust->custdb: Cập nhật thông tin ekyc
+custdb++
+custdb-->cust:
+custdb--
+cust->trans: Thêm bản ghi về trạng thái lấy thông tin KH
+trans++
+trans->transdb: Thêm vào db
+transdb++
+transdb-->trans
+transdb--
+trans-->cust
+trans--
 cust-->spi:
-spi-->partner: Tra ve thanh cong
+spi-->partner: Trả về thành công
 
 cust--
 
 spi--
 partner--
 @enduml
-
-
-
-
-
-
-
-
-
-
-
-
