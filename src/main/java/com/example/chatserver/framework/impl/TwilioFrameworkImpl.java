@@ -18,10 +18,11 @@ public class TwilioFrameworkImpl implements SmsFramework {
     
     @Override
     public String getTemplateSms(TypeOtpEnum typeOtp) {
-        if(typeOtp==TypeOtpEnum.REGISTER) {
-            return "Day la ma code dang ky tai khoan. \n vui long khong chia se cho bat ki ai.\n Ma code la: %s";
-        }
-
-        return "";
+        return switch (typeOtp) {
+            case REGISTER ->
+                    "Day la ma code dang ky tai khoan. \n vui long khong chia se cho bat ki ai.\n Ma code la: %s";
+            case LOGIN -> "Day la ma code dang dang nhap tai khoan. \n vui long khong chia se cho bat ki ai.\n Ma code la: %s";
+            default -> "";
+        };
     }
 }

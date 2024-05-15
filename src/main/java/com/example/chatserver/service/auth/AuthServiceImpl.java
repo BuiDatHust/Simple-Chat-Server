@@ -1,7 +1,12 @@
 package com.example.chatserver.service.auth;
 
 import java.util.Date;
+import java.util.Objects;
 
+import com.example.chatserver.entity.LoginDevice;
+import com.example.chatserver.repository.LoginDeviceRepository;
+import com.example.chatserver.service.auth.dto.request.LoginRequestDto;
+import com.example.chatserver.service.auth.dto.response.LoginResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,14 +29,20 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class AuthServiceImpl implements AuthService {
-    @Autowired
-    private UserRepository userRepository;
-    
-    @Autowired
-    private OtpService otpService;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private TwilioFrameworkImpl twilioFrameworkImpl;
+    private final OtpService otpService;
+
+    private final TwilioFrameworkImpl twilioFrameworkImpl;
+
+    private final LoginDeviceRepository loginDeviceRepository;
+
+    public AuthServiceImpl(UserRepository userRepository, OtpService otpService, TwilioFrameworkImpl twilioFrameworkImpl, LoginDeviceRepository loginDeviceRepository) {
+        this.userRepository = userRepository;
+        this.otpService = otpService;
+        this.twilioFrameworkImpl = twilioFrameworkImpl;
+        this.loginDeviceRepository = loginDeviceRepository;
+    }
 
     @Transactional
     @Override
@@ -52,7 +63,7 @@ public class AuthServiceImpl implements AuthService {
         .build();
         userRepository.save(newUser);
 
-        String body = String.format(twilioFrameworkImpl.getTemplateSms(TypeOtpEnum.REGISTER), null);
+        String body = String.format(twilioFrameworkImpl.getTemplateSms(TypeOtpEnum.REGISTER));
         SendOtpRequestDto sendOtpRequestDto = SendOtpRequestDto
             .builder()
             .recipent(phoneNumber)
@@ -61,5 +72,27 @@ public class AuthServiceImpl implements AuthService {
             .build();
         otpService.sendOtp(sendOtpRequestDto);
         return new RegisterByPhoneResponseDto();
+    }
+
+    @Override
+    public LoginResponseDto login(LoginRequestDto loginRequestDto) {
+        User user = userRepository.findOneByPhoneNumberAndStatus(loginRequestDto.getPhoneNumber(), UserChatStatusEnum.ACTIVE.toString());
+        if(Objects.isNull(user)){
+            throw new BaseException(ResponseStatusCodeEnum.USER_NOT_EXIST);
+        }
+        LoginDevice loginDevice = loginDeviceRepository.findOneLoginDeviceByNameAndUserId(loginRequestDto.getDeviceName(), user.getId());
+        if(!Objects.isNull(loginDevice)) {
+//            todo: create message system otp
+        }
+
+        String body = String.format(twilioFrameworkImpl.getTemplateSms(TypeOtpEnum.LOGIN));
+        SendOtpRequestDto sendOtpRequestDto = SendOtpRequestDto
+                .builder()
+                .recipent(loginRequestDto.getPhoneNumber())
+                .body(body)
+                .typeOtp(TypeOtpEnum.LOGIN)
+                .build();
+        otpService.sendOtp(sendOtpRequestDto);
+        return new LoginResponseDto();
     }
 }

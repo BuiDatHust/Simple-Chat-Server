@@ -60,4 +60,7 @@ public class User implements Serializable {
 
     @OneToOne(mappedBy = "user")
     private UserSetting useSetting;
+
+    @OneToMany(mappedBy="user")
+    private Set<LoginDevice> loginDevice;
 }

@@ -1,4 +1,4 @@
-package com.example.chatserver.configuration;
+package com.example.chatserver.configuration.cache;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

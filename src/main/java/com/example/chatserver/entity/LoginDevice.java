@@ -1,7 +1,6 @@
 package com.example.chatserver.entity;
 
 import com.example.chatserver.entity.enums.LoginDeviceStatusEnum;
-import com.example.chatserver.validation.EnumValidator;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,14 +25,14 @@ public class LoginDevice {
     @Nonnull
     private String name;
 
-    @Column(name = "location", unique = true)
-    @Nonnull
-    private String location;
-
     @Column(name = "status")
     @Nonnull
     @Enumerated(EnumType.STRING)
     private LoginDeviceStatusEnum status;
+
+    @ManyToOne
+    @JoinColumn(name="user_id")
+    private User user;
 
     @Column(name = "created_date")
     @Nonnull

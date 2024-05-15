@@ -54,7 +54,8 @@ class ApplicationConfig {
     return dataSource;
   }
 
-    @Bean public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+    @Bean
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
       LocalContainerEntityManagerFactoryBean em 
         = new LocalContainerEntityManagerFactoryBean();
       em.setDataSource(dataSource());
@@ -67,14 +68,16 @@ class ApplicationConfig {
       return em;
     } 
 
-    @Bean public PlatformTransactionManager transactionManager() {
+    @Bean
+    public PlatformTransactionManager transactionManager() {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
 
         return transactionManager;
     }
 
-    @Bean public PersistenceExceptionTranslationPostProcessor exceptionTranslation(){
+    @Bean
+    public PersistenceExceptionTranslationPostProcessor exceptionTranslation(){
         return new PersistenceExceptionTranslationPostProcessor();
     }
 

@@ -1,0 +1,1 @@
+ALTER TABLE login_device ADD user_id BIGINT NOT NULL REFERENCES user_chat (id);

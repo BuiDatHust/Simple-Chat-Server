@@ -17,15 +17,16 @@ import com.example.chatserver.service.user.dto.response.OnboardingResponseDto;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/user")
 public class UserControllerImpl implements UserOperation {
-    @Autowired
-    private ResponseFactory responseFactory;
+    private final ResponseFactory responseFactory;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @PostMapping("/onboard")
+    public UserControllerImpl(ResponseFactory responseFactory, UserService userService) {
+        this.responseFactory = responseFactory;
+        this.userService = userService;
+    }
+
     @Override
     public ResponseEntity<GeneralResponse<OnboardingResponseDto>> onboard(
             @Valid OnboardingRequestDto onboardingRequestDto) {

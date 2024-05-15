@@ -1,5 +1,7 @@
 package com.example.chatserver.controller.impl;
 
+import com.example.chatserver.service.auth.dto.request.LoginRequestDto;
+import com.example.chatserver.service.auth.dto.response.LoginResponseDto;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,17 +18,23 @@ import com.example.chatserver.service.auth.dto.request.RegisterByPhoneRequestDto
 import com.example.chatserver.service.auth.dto.response.RegisterByPhoneResponseDto;
 
 @RestController
-@RequestMapping("/auth")
 public class AuthControllerImpl implements AuthOperation {
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
 
-    @Autowired
-    private ResponseFactory responseFactory;
+    private final ResponseFactory responseFactory;
 
-    @PostMapping(path = "/register-by-phone", consumes = "application/json", produces = "application/json")
+    public AuthControllerImpl(AuthService authService, ResponseFactory responseFactory) {
+        this.authService = authService;
+        this.responseFactory = responseFactory;
+    }
+
     public ResponseEntity<GeneralResponse<RegisterByPhoneResponseDto>> registerByPhone(
         @Valid @RequestBody RegisterByPhoneRequestDto registerByPhoneRequestDto) {
         return responseFactory.success(authService.registerByPhone(registerByPhoneRequestDto));
+    }
+
+    @Override
+    public ResponseEntity<GeneralResponse<LoginResponseDto>> login(LoginRequestDto loginRequestDto) {
+        return responseFactory.success(authService.login(loginRequestDto));
     }
 }
