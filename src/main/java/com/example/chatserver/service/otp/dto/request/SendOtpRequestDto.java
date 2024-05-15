@@ -13,9 +13,6 @@ public class SendOtpRequestDto {
     @NotNull
     private String recipent;
 
-    @NotNull
-    private String body;
-
     @NotNull 
     private TypeOtpEnum typeOtp;
 }

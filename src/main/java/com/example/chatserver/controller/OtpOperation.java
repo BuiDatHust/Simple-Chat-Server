@@ -23,5 +23,5 @@ public interface OtpOperation {
     ResponseEntity<GeneralResponse<ResendOtpResponseDto>> resendOtp(@RequestBody @Valid ResendOtpRequestDto resendOtpRequestDto);
 
     @PostMapping("/login-verification")
-    ResponseEntity<GeneralResponse<CheckLoginOtpResponseDto>> verifyLoginOtp(@RequestBody @Valid CheckLoginOtpRequestDto registerByPhoneRequestDto);
+    ResponseEntity<GeneralResponse<CheckLoginOtpResponseDto>> verifyLoginOtp(@RequestBody @Valid CheckLoginOtpRequestDto cLoginOtpRequestDto);
 }

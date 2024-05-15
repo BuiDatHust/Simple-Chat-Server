@@ -6,7 +6,6 @@ import com.example.chatserver.service.otp.dto.response.CheckLoginOtpResponseDto;
 import com.example.chatserver.service.otp.dto.response.CheckOtpResponseDto;
 import com.example.chatserver.service.otp.dto.response.ResendOtpResponseDto;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;

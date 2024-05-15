@@ -63,11 +63,9 @@ public class AuthServiceImpl implements AuthService {
         .build();
         userRepository.save(newUser);
 
-        String body = String.format(twilioFrameworkImpl.getTemplateSms(TypeOtpEnum.REGISTER));
         SendOtpRequestDto sendOtpRequestDto = SendOtpRequestDto
             .builder()
             .recipent(phoneNumber)
-            .body(body)
             .typeOtp(TypeOtpEnum.REGISTER)
             .build();
         otpService.sendOtp(sendOtpRequestDto);
@@ -76,7 +74,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResponseDto login(LoginRequestDto loginRequestDto) {
-        User user = userRepository.findOneByPhoneNumberAndStatus(loginRequestDto.getPhoneNumber(), UserChatStatusEnum.ACTIVE.toString());
+        User user = userRepository.findOneByPhoneNumberAndStatus(loginRequestDto.getPhoneNumber(), UserChatStatusEnum.ACTIVE);
         if(Objects.isNull(user)){
             throw new BaseException(ResponseStatusCodeEnum.USER_NOT_EXIST);
         }
@@ -85,11 +83,9 @@ public class AuthServiceImpl implements AuthService {
 //            todo: create message system otp
         }
 
-        String body = String.format(twilioFrameworkImpl.getTemplateSms(TypeOtpEnum.LOGIN));
         SendOtpRequestDto sendOtpRequestDto = SendOtpRequestDto
                 .builder()
                 .recipent(loginRequestDto.getPhoneNumber())
-                .body(body)
                 .typeOtp(TypeOtpEnum.LOGIN)
                 .build();
         otpService.sendOtp(sendOtpRequestDto);

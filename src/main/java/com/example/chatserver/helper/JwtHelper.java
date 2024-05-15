@@ -34,7 +34,7 @@ public class JwtHelper {
       return Jwts.builder()
               .setIssuedAt(DateTimeHelper.convertUtcToDate(time))
               .setExpiration(DateTimeHelper.convertUtcToDate(expireTime))
-              .setPayload(phoneNumber)
+              .setClaims(phoneNumber)
               .signWith(key(tokenType), SignatureAlgorithm.HS256)
               .compact();
     }
@@ -42,7 +42,7 @@ public class JwtHelper {
       return Jwts.builder()
               .setIssuedAt(DateTimeHelper.convertUtcToDate(time))
               .setExpiration(DateTimeHelper.convertUtcToDate(expireTime))
-              .setPayload(phoneNumber)
+              .setClaims(phoneNumber)
               .signWith(key(tokenType), SignatureAlgorithm.HS256)
               .compact();
     }

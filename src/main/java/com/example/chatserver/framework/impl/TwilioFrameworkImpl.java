@@ -22,6 +22,7 @@ public class TwilioFrameworkImpl implements SmsFramework {
             case REGISTER ->
                     "Day la ma code dang ky tai khoan. \n vui long khong chia se cho bat ki ai.\n Ma code la: %s";
             case LOGIN -> "Day la ma code dang dang nhap tai khoan. \n vui long khong chia se cho bat ki ai.\n Ma code la: %s";
+            case LOGIN_NEW_DEVICE -> "";
             default -> "";
         };
     }

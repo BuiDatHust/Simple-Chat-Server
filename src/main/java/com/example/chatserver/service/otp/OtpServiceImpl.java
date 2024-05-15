@@ -17,6 +17,9 @@ import com.example.chatserver.service.otp.dto.request.CheckLoginOtpRequestDto;
 import com.example.chatserver.service.otp.dto.request.ResendOtpRequestDto;
 import com.example.chatserver.service.otp.dto.response.CheckLoginOtpResponseDto;
 import com.example.chatserver.service.otp.dto.response.CheckOtpResponseDto;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -69,6 +72,8 @@ public class OtpServiceImpl implements OtpService {
         long currentTime = new Date().getTime();
         String valueOtp = GenerateOTP.generateOTP();
         long expireAt = currentTime + otpExpireTime;
+        
+        String body = String.format(twilioFramework.getTemplateSms(sendOtpRequestDto.getTypeOtp()), valueOtp);
         Otp otp = Otp.builder()
             .value(valueOtp)
             .isActive(true)
@@ -79,13 +84,16 @@ public class OtpServiceImpl implements OtpService {
             .build();
         otpRepository.save(otp);
 //        otpRepository.inActiveAllOldOtp(sendOtpRequestDto.getTypeOtp().toString(), sendOtpRequestDto.getRecipent());
-        twilioFramework.sendSms("admin", sendOtpRequestDto.getRecipent(), sendOtpRequestDto.getBody());
+        twilioFramework.sendSms("admin", sendOtpRequestDto.getRecipent(), body);
     }
 
     @Override
     public void resendOtp(ResendOtpRequestDto resendOtpRequestDto) {
         if(Objects.equals(resendOtpRequestDto.getTypeOtp(), TypeOtpEnum.REGISTER.toString())){
             handleResendRegisterOtp(resendOtpRequestDto);
+        }
+        if(Objects.equals(resendOtpRequestDto.getTypeOtp(), TypeOtpEnum.LOGIN.toString())){
+            handleResendLoginOtp(resendOtpRequestDto);
         }
     }
 
@@ -98,7 +106,6 @@ public class OtpServiceImpl implements OtpService {
         SendOtpRequestDto sendOtpRequestDto = SendOtpRequestDto.builder()
                 .typeOtp(TypeOtpEnum.REGISTER)
                 .recipent(resendOtpRequestDto.getPhoneNumber())
-                .body(twilioFramework.getTemplateSms(TypeOtpEnum.REGISTER))
                 .build();
         sendOtp(sendOtpRequestDto);
     }
@@ -128,6 +135,7 @@ public class OtpServiceImpl implements OtpService {
         return true;
     }
 
+    @Transactional
     public CheckLoginOtpResponseDto checkOtpLogin(CheckLoginOtpRequestDto checkLoginOtpRequestDto){
         User user = userRepository.findOneByPhoneNumber(checkLoginOtpRequestDto.getPhoneNumber());
         if(Objects.isNull(user)) {
@@ -179,5 +187,18 @@ public class OtpServiceImpl implements OtpService {
 
     private String getRefreshTokenKey(Long userId, String refreshToken) {
         return String.format(REFRESH_TOKEN_CACHE_TEMPLATE, userId, refreshToken);
+    }
+
+    public void handleResendLoginOtp(ResendOtpRequestDto resendOtpRequestDto) {
+        User user = userRepository.findOneByPhoneNumberAndStatus(resendOtpRequestDto.getPhoneNumber(), UserChatStatusEnum.ACTIVE);
+        if(Objects.isNull(user)){
+            throw new BaseException(ResponseStatusCodeEnum.USER_NOT_EXIST);
+        }
+
+        SendOtpRequestDto sendOtpRequestDto = SendOtpRequestDto.builder()
+                .typeOtp(TypeOtpEnum.LOGIN)
+                .recipent(resendOtpRequestDto.getPhoneNumber())
+                .build();
+        sendOtp(sendOtpRequestDto);
     }
 }
