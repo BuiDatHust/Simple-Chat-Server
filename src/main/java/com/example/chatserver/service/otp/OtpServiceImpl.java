@@ -7,16 +7,15 @@ import com.example.chatserver.entity.LoginDevice;
 import com.example.chatserver.entity.RefreshToken;
 import com.example.chatserver.entity.enums.LoginDeviceStatusEnum;
 import com.example.chatserver.framework.InmemoryDatabaseFramework;
-import com.example.chatserver.framework.impl.RedisFrameworkImpl;
-import com.example.chatserver.helper.JwtHelper;
 import com.example.chatserver.helper.datetime.DateTimeHelper;
+import com.example.chatserver.helper.jwt.JwtHelper;
+import com.example.chatserver.helper.jwt.TokenGenrationData;
 import com.example.chatserver.repository.LoginDeviceRepository;
 import com.example.chatserver.repository.RefreshTokenRepository;
 import com.example.chatserver.service.auth.enums.TokenType;
 import com.example.chatserver.service.otp.dto.request.CheckLoginOtpRequestDto;
 import com.example.chatserver.service.otp.dto.request.ResendOtpRequestDto;
 import com.example.chatserver.service.otp.dto.response.CheckLoginOtpResponseDto;
-import com.example.chatserver.service.otp.dto.response.CheckOtpResponseDto;
 
 import jakarta.transaction.Transactional;
 
@@ -167,8 +166,24 @@ public class OtpServiceImpl implements OtpService {
         Long time = DateTimeHelper.getCurrentTimeUtcMs();
         Long expireTimeAccessToken = jwtHelper.getExpireTime(TokenType.ACCESS_TOKEN, time);
         Long expireTimeRefreshToken = jwtHelper.getExpireTime(TokenType.REFRESH_TOKEN, time);
-        String accessToken = jwtHelper.generateJwtToken(TokenType.ACCESS_TOKEN, checkLoginOtpRequestDto.getPhoneNumber(), time, expireTimeAccessToken);
-        String refreshToken = jwtHelper.generateJwtToken(TokenType.REFRESH_TOKEN, checkLoginOtpRequestDto.getPhoneNumber(), time, expireTimeRefreshToken);
+        TokenGenrationData accesTokenGenrationData = TokenGenrationData.builder()
+            .deviceName(checkLoginOtpRequestDto.getDeviceName())
+            .tokenType(TokenType.ACCESS_TOKEN)
+            .phoneNumber(checkLoginOtpRequestDto.getPhoneNumber())
+            .time(time)
+            .expireTime(expireTimeAccessToken)
+            .userId(user.getId())
+            .build();
+        TokenGenrationData refTokenGenrationData = TokenGenrationData.builder()
+            .deviceName(checkLoginOtpRequestDto.getDeviceName())
+            .tokenType(TokenType.REFRESH_TOKEN)
+            .phoneNumber(checkLoginOtpRequestDto.getPhoneNumber())
+            .time(time)
+            .expireTime(expireTimeRefreshToken)
+            .userId(user.getId())
+            .build();
+        String accessToken = jwtHelper.generateJwtToken(accesTokenGenrationData);
+        String refreshToken = jwtHelper.generateJwtToken(refTokenGenrationData);
         RefreshToken newRefreshToken = RefreshToken.builder()
                 .value(refreshToken)
                 .isActive(true)

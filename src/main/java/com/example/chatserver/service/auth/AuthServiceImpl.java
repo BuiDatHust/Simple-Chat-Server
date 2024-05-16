@@ -5,16 +5,19 @@ import java.util.Objects;
 
 import com.example.chatserver.entity.LoginDevice;
 import com.example.chatserver.repository.LoginDeviceRepository;
+import com.example.chatserver.repository.RefreshTokenRepository;
 import com.example.chatserver.service.auth.dto.request.LoginRequestDto;
+import com.example.chatserver.service.auth.dto.request.LogoutRequestDto;
 import com.example.chatserver.service.auth.dto.response.LoginResponseDto;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.chatserver.service.auth.dto.response.LogoutResponseDto;
+
 import org.springframework.stereotype.Service;
 
 import com.example.chatserver.entity.User;
+import com.example.chatserver.entity.enums.LoginDeviceStatusEnum;
 import com.example.chatserver.entity.enums.TypeOtpEnum;
 import com.example.chatserver.entity.enums.UserChatStatusEnum;
 import com.example.chatserver.exception.BaseException;
-import com.example.chatserver.framework.impl.TwilioFrameworkImpl;
 import com.example.chatserver.helper.PhoneHelper;
 import com.example.chatserver.helper.response.ResponseStatusCodeEnum;
 import com.example.chatserver.repository.UserRepository;
@@ -30,18 +33,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
-
     private final OtpService otpService;
-
-    private final TwilioFrameworkImpl twilioFrameworkImpl;
-
     private final LoginDeviceRepository loginDeviceRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
-    public AuthServiceImpl(UserRepository userRepository, OtpService otpService, TwilioFrameworkImpl twilioFrameworkImpl, LoginDeviceRepository loginDeviceRepository) {
+    public AuthServiceImpl(UserRepository userRepository, OtpService otpService, LoginDeviceRepository loginDeviceRepository) {
         this.userRepository = userRepository;
         this.otpService = otpService;
-        this.twilioFrameworkImpl = twilioFrameworkImpl;
         this.loginDeviceRepository = loginDeviceRepository;
+        this.refreshTokenRepository = null;
     }
 
     @Transactional
@@ -90,5 +90,13 @@ public class AuthServiceImpl implements AuthService {
                 .build();
         otpService.sendOtp(sendOtpRequestDto);
         return new LoginResponseDto();
+    }
+
+    @Transactional
+    @Override
+    public LogoutResponseDto logout(LogoutRequestDto logoutRequestDto, String phoneNumber, String deviceName, Long userId) {
+        refreshTokenRepository.deleteAllByDeviceNameAndUserId(deviceName, userId);
+        loginDeviceRepository.updateStatusByPhoneNumberAndDevice(LoginDeviceStatusEnum.INACTIVE, deviceName, deviceName);
+        return new LogoutResponseDto();
     }
 }

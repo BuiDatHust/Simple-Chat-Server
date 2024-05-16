@@ -1,8 +1,9 @@
-package com.example.chatserver.helper;
+package com.example.chatserver.helper.jwt;
 
 
 import java.security.Key;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.example.chatserver.helper.datetime.DateTimeHelper;
 import com.example.chatserver.service.auth.enums.TokenType;
@@ -29,21 +30,26 @@ public class JwtHelper {
   @Value("${app.security.jwt.refresh-token.expire-time}")
   private int jwtRefreshTokenExpirationMs;
 
-  public String generateJwtToken(TokenType tokenType,String phoneNumber, Long time, Long expireTime) {
-    if(tokenType==TokenType.ACCESS_TOKEN) {
+  public String generateJwtToken(TokenGenrationData tokenGenrationData) {
+    Map<String, Object> claims = new HashMap<>();
+    claims.put("phoneNumber", tokenGenrationData.getPhoneNumber());
+    claims.put("tokenType", tokenGenrationData.getTokenType());
+    claims.put("deviceName", tokenGenrationData.getDeviceName());
+    claims.put("userId", tokenGenrationData.getUserId());
+    if(tokenGenrationData.getTokenType()==TokenType.ACCESS_TOKEN) {
       return Jwts.builder()
-              .setIssuedAt(DateTimeHelper.convertUtcToDate(time))
-              .setExpiration(DateTimeHelper.convertUtcToDate(expireTime))
-              .setClaims(phoneNumber)
-              .signWith(key(tokenType), SignatureAlgorithm.HS256)
+              .setIssuedAt(DateTimeHelper.convertUtcToDate(tokenGenrationData.getTime()))
+              .setExpiration(DateTimeHelper.convertUtcToDate(tokenGenrationData.getExpireTime()))
+              .setClaims(claims)
+              .signWith(key(tokenGenrationData.getTokenType()), SignatureAlgorithm.HS256)
               .compact();
     }
-    if(tokenType==TokenType.REFRESH_TOKEN) {
+    if(tokenGenrationData.getTokenType()==TokenType.REFRESH_TOKEN) {
       return Jwts.builder()
-              .setIssuedAt(DateTimeHelper.convertUtcToDate(time))
-              .setExpiration(DateTimeHelper.convertUtcToDate(expireTime))
-              .setClaims(phoneNumber)
-              .signWith(key(tokenType), SignatureAlgorithm.HS256)
+              .setIssuedAt(DateTimeHelper.convertUtcToDate(tokenGenrationData.getTime()))
+              .setExpiration(DateTimeHelper.convertUtcToDate(tokenGenrationData.getExpireTime()))
+              .setClaims(claims)
+              .signWith(key(tokenGenrationData.getTokenType()), SignatureAlgorithm.HS256)
               .compact();
     }
     return "";
