@@ -15,4 +15,6 @@ public interface ResponseStatusCodeEnum {
     ResponseStatusCode USER_IS_NOT_PENDING_OTP = ResponseStatusCode.builder().code("BS11").httpCode(400).build();
     ResponseStatusCode USER_IS_NOT_PENDING_ONBOARD = ResponseStatusCode.builder().code("BS12").httpCode(400).build();
     ResponseStatusCode USER_NOT_ACTIVE = ResponseStatusCode.builder().code("BS13").httpCode(400).build();
+    ResponseStatusCode DEVICE_NOT_EXIST = ResponseStatusCode.builder().code("BS14").httpCode(400).build();
+    ResponseStatusCode FORBIDDEN_TOKEN_INVALID = ResponseStatusCode.builder().code("BS14").httpCode(400).build();
 }

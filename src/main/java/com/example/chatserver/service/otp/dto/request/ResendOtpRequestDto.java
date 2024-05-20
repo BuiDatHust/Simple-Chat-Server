@@ -1,7 +1,7 @@
 package com.example.chatserver.service.otp.dto.request;
 
 import com.example.chatserver.entity.enums.TypeOtpEnum;
-import com.example.chatserver.validation.EnumValidator;
+import com.example.chatserver.validation.annotation.EnumValidator;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 

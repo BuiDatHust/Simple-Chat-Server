@@ -1,7 +1,12 @@
 package com.example.chatserver.controller.impl;
 
+import com.example.chatserver.constant.TokenParams;
 import com.example.chatserver.service.auth.dto.request.LoginRequestDto;
+import com.example.chatserver.service.auth.dto.request.LogoutRequestDto;
 import com.example.chatserver.service.auth.dto.response.LoginResponseDto;
+import com.example.chatserver.service.auth.dto.response.LogoutResponseDto;
+import com.example.chatserver.service.otp.dto.request.LogoutDataDto;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +21,7 @@ import com.example.chatserver.helper.response.ResponseFactory;
 import com.example.chatserver.service.auth.AuthService;
 import com.example.chatserver.service.auth.dto.request.RegisterByPhoneRequestDto;
 import com.example.chatserver.service.auth.dto.response.RegisterByPhoneResponseDto;
+import org.springframework.web.util.ContentCachingRequestWrapper;
 
 @RestController
 public class AuthControllerImpl implements AuthOperation {
@@ -36,5 +42,17 @@ public class AuthControllerImpl implements AuthOperation {
     @Override
     public ResponseEntity<GeneralResponse<LoginResponseDto>> login(LoginRequestDto loginRequestDto) {
         return responseFactory.success(authService.login(loginRequestDto));
+    }
+
+    @Override
+    public ResponseEntity<GeneralResponse<LogoutResponseDto>> logout(LogoutRequestDto logoutRequestDto, HttpServletRequest request) {
+        LogoutDataDto logoutDataDto = LogoutDataDto.builder()
+                .phoneNumber((String) request.getAttribute(TokenParams.phoneNumber))
+                .deviveName((String) request.getAttribute(TokenParams.deviceName))
+                .userId((Long) request.getAttribute(TokenParams.userId))
+                .build();
+        ContentCachingRequestWrapper requestWrapper = new ContentCachingRequestWrapper(request);
+        System.out.println(requestWrapper.getAttribute("phoneNumber"));
+        return responseFactory.success(authService.logout(logoutDataDto));
     }
 }

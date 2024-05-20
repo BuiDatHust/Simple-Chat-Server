@@ -1,7 +1,10 @@
 package com.example.chatserver.controller;
 
 import com.example.chatserver.service.auth.dto.request.LoginRequestDto;
+import com.example.chatserver.service.auth.dto.request.LogoutRequestDto;
 import com.example.chatserver.service.auth.dto.response.LoginResponseDto;
+import com.example.chatserver.service.auth.dto.response.LogoutResponseDto;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,4 +22,7 @@ public interface AuthOperation {
 
     @PostMapping("/login")
     ResponseEntity<GeneralResponse<LoginResponseDto>> login(@Valid @RequestBody LoginRequestDto loginRequestDto);
+
+    @PostMapping("/logout")
+    ResponseEntity<GeneralResponse<LogoutResponseDto>> logout(@Valid @RequestBody LogoutRequestDto logoutRequestDto, HttpServletRequest httpServletRequest);
 }

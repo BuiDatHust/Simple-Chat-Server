@@ -13,6 +13,6 @@ public interface LoginDeviceRepository extends JpaRepository<LoginDevice, Long> 
     LoginDevice findOneLoginDeviceByNameAndUserId(String name, Long userId);
 
     @Modifying
-    @Query("update LoginDevice ld set ld.status = ?1 where ld.phoneNumber = ?2 and ld.deviceName = ?3")
-    void updateStatusByPhoneNumberAndDevice( LoginDeviceStatusEnum loginDeviceStatusEnum, String phoneNumber, String deviceName);
+    @Query("update LoginDevice ld set ld.status = ?1 where ld.user = ?2 and ld.name = ?3")
+    void updateStatusByUserIdAndDevice( LoginDeviceStatusEnum loginDeviceStatusEnum, Long userId, String deviceName);
 }

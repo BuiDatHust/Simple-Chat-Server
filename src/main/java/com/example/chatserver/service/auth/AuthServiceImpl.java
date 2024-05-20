@@ -3,6 +3,7 @@ package com.example.chatserver.service.auth;
 import java.util.Date;
 import java.util.Objects;
 
+import com.example.chatserver.constant.TokenParams;
 import com.example.chatserver.entity.LoginDevice;
 import com.example.chatserver.repository.LoginDeviceRepository;
 import com.example.chatserver.repository.RefreshTokenRepository;
@@ -11,6 +12,8 @@ import com.example.chatserver.service.auth.dto.request.LogoutRequestDto;
 import com.example.chatserver.service.auth.dto.response.LoginResponseDto;
 import com.example.chatserver.service.auth.dto.response.LogoutResponseDto;
 
+import com.example.chatserver.service.otp.dto.request.LogoutDataDto;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 
 import com.example.chatserver.entity.User;
@@ -37,11 +40,11 @@ public class AuthServiceImpl implements AuthService {
     private final LoginDeviceRepository loginDeviceRepository;
     private final RefreshTokenRepository refreshTokenRepository;
 
-    public AuthServiceImpl(UserRepository userRepository, OtpService otpService, LoginDeviceRepository loginDeviceRepository) {
+    public AuthServiceImpl(UserRepository userRepository, OtpService otpService, LoginDeviceRepository loginDeviceRepository, RefreshTokenRepository refreshTokenRepository) {
         this.userRepository = userRepository;
         this.otpService = otpService;
         this.loginDeviceRepository = loginDeviceRepository;
-        this.refreshTokenRepository = null;
+        this.refreshTokenRepository = refreshTokenRepository;
     }
 
     @Transactional
@@ -92,11 +95,16 @@ public class AuthServiceImpl implements AuthService {
         return new LoginResponseDto();
     }
 
-    @Transactional
     @Override
-    public LogoutResponseDto logout(LogoutRequestDto logoutRequestDto, String phoneNumber, String deviceName, Long userId) {
-        refreshTokenRepository.deleteAllByDeviceNameAndUserId(deviceName, userId);
-        loginDeviceRepository.updateStatusByPhoneNumberAndDevice(LoginDeviceStatusEnum.INACTIVE, deviceName, deviceName);
-        return new LogoutResponseDto();
+    public LogoutResponseDto logout(LogoutDataDto logoutDataDto) {
+        LoginDevice loginDevice = loginDeviceRepository.findOneLoginDeviceByNameAndUserId(logoutDataDto.getDeviveName(), logoutDataDto.getUserId());
+        if(Objects.isNull(loginDevice)) {
+            throw new BaseException(ResponseStatusCodeEnum.DEVICE_NOT_EXIST);
+        }
+        loginDevice.setStatus(LoginDeviceStatusEnum.INACTIVE);
+        loginDeviceRepository.save(loginDevice);
+        refreshTokenRepository.deleteAllByLoginDevice(loginDevice);
+        return null;
     }
+
 }

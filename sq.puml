@@ -1,0 +1,145 @@
+@startuml
+
+' Reference:
+' https://plantuml.com/sequence-diagram
+' https://plantuml-documentation.readthedocs.io/en/latest/formatting/all-skin-params.html
+'
+' Author: datbt9
+' Date: 01/04/2024
+' Jira: http://10.254.136.35:8090/pages/resumedraft.action?draftId=65714137&draftShareId=58ce2748-b779-45e3-9a12-a3720325b42c&
+
+skinparam shadowing false
+skinparam responseMessageBelowArrow false
+
+skinparam DefaultFontColor #222
+skinparam TitleFontSize 25
+
+skinparam NoteBorderColor #teal
+skinparam NoteBackgroundColor #powderblue
+skinparam NoteFontColor #444
+
+skinparam DatabaseBorderColor #teal
+skinparam DatabaseBackgroundColor #bisque
+
+skinparam sequence {
+  ParticipantBorderThickness 1
+  ParticipantBorderColor #teal
+  ParticipantBackgroundColor #teal
+  ParticipantFontColor #white
+  ParticipantFontSize 14
+  ParticipantFontStyle bold
+
+  LifeLineBorderColor #teal
+  LifeLineBackgroundColor #aliceblue
+
+  ArrowColor #teal
+  ActorBorderColor #teal
+
+  GroupBorderThickness 1
+  GroupBorderColor #teal
+  GroupHeaderFontColor #white
+  GroupBackgroundColor #teal
+  GroupFontColor #teal
+
+
+  ReferenceBorderThickness 1
+  ReferenceBorderColor #teal
+  ReferenceBackgroundColor #aliceblue
+  ReferenceHeaderBackgroundColor #white
+  ReferenceFontColor #teal
+}
+
+header : datbt9
+title : [API] Luồng xác thực GTTT
+
+participant "mobile app" as app
+participant "Inv Customer Info" as custinfo
+participant "Inv Customer Transaction" as trans
+participant "Inv Config" as config
+participant "spi-eKyc" as spiekyc
+participant "customer-service" as custservice
+participant "CustDB" as custdb
+participant "TransDB" as transdbc
+participant "ConfigDB" as configdb
+participant "Redis" as redis
+participant "Hbase" as hbase
+autonumber
+
+app->custinfo: Xác thực thông tin GTTT
+custinfo++
+app++
+custinfo-->custinfo: Lưu log
+custinfo-->custinfo: Validate request
+alt Validate thất bại:
+    custinfo-->app: Trả về lỗi
+    trans--
+end
+custinfo->redis: Lấy thông tin về phiên xác thực eKyc hiện tại
+redis++
+redis-->custinfo
+redis--
+custinfo-->custinfo: Kiểm tra kết quả
+alt Nếu tồn tại thông tin \n (Đang thực hiện xác thực GTTT trước đó)
+'    custinfo->trans
+'    trans++
+'    trans->transdb: Lưu lịch sử eKyc thất bại
+'    transdb++
+'    transdb-->trans
+'    transdb--
+'    trans->hbase: Đẩy thông tin eKyc thất bại
+'    hbase++
+'    hbase-->trans
+'    hbase--
+'    trans-->custinfo:
+'    trans--
+    custinfo-->app: Trả về lỗi
+end
+custinfo->redis: Lưu key xác định khách hàng đang thực hiện xác thực GTTT
+redis++
+redis-->custinfo
+redis--
+
+custinfo->spiekyc: Upload ảnh mặt trước lên server đối tác
+spiekyc++
+spiekyc-->custinfo
+spiekyc--
+custinfo-->custinfo: Kiểm tra kiểu GTTT
+alt Nếu GTTT không phải hộ chiếu
+    custinfo->spiekyc: Upload ảnh mặt sau lên server đối tác
+    spiekyc++
+    spiekyc-->custinfo
+    spiekyc--
+end
+
+custinfo->redis: Lấy thông tin key xác định khách hàng đang thực hiện quá trình eKyc
+redis++
+redis-->custinfo
+redis--
+custinfo-->custinfo: Kiểm tra kết quả
+alt Nếu không tồn tại
+    custinfo-->app: Trả về lỗi
+end
+
+custinfo->redis: Lấy thông tin về phiên xác thực eKyc hiện tại
+redis++
+redis-->custinfo
+redis--
+custinfo-->custinfo: Kiểm tra kết quả
+alt  Không tồn tại thông tin phiên:
+    custinfo-->app: Trả về lỗi SESSION_TIMEOUT
+end
+custinfo-->config: Lấy cấu hình eKyc
+config++
+config->configdb: Lấy cấu hình eKyc
+configdb++
+configdb-->config
+configdb--
+config-->custinfo:
+config--
+custinfo->spiekyc: Đọc thông tin GTTT
+spiekyc++
+spiekyc-->custinfo
+spiekyc--
+
+
+@enduml

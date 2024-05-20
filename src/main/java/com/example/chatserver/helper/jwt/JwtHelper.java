@@ -5,8 +5,10 @@ import java.security.Key;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.example.chatserver.constant.TokenParams;
 import com.example.chatserver.helper.datetime.DateTimeHelper;
 import com.example.chatserver.service.auth.enums.TokenType;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -32,10 +34,10 @@ public class JwtHelper {
 
   public String generateJwtToken(TokenGenrationData tokenGenrationData) {
     Map<String, Object> claims = new HashMap<>();
-    claims.put("phoneNumber", tokenGenrationData.getPhoneNumber());
-    claims.put("tokenType", tokenGenrationData.getTokenType());
-    claims.put("deviceName", tokenGenrationData.getDeviceName());
-    claims.put("userId", tokenGenrationData.getUserId());
+    claims.put(TokenParams.phoneNumber, tokenGenrationData.getPhoneNumber());
+    claims.put(TokenParams.tokenType, tokenGenrationData.getTokenType());
+    claims.put(TokenParams.deviceName, tokenGenrationData.getDeviceName());
+    claims.put(TokenParams.userId, tokenGenrationData.getUserId());
     if(tokenGenrationData.getTokenType()==TokenType.ACCESS_TOKEN) {
       return Jwts.builder()
               .setIssuedAt(DateTimeHelper.convertUtcToDate(tokenGenrationData.getTime()))
@@ -68,14 +70,17 @@ public class JwtHelper {
 
   public boolean validateToken(TokenType tokenType, String authToken) {
     try {
-      Jwts.parserBuilder().setSigningKey(key(tokenType)).build().parse(authToken);
+      Jwts.parserBuilder()
+              .setSigningKey(key(tokenType))
+              .build()
+              .parse(authToken);
       return true;
     } catch (MalformedJwtException e) {
       log.error("Invalid JWT token: {}", e.getMessage());
     } catch (ExpiredJwtException e) {
       log.error("JWT token is expired: {}", e.getMessage());
-    } catch (UnsupportedJwtException e) {
-      log.error("JWT token is unsupported: {}", e.getMessage());
+    } catch (SignatureException e) {
+      log.error("Signature exception: {}", e.getMessage());
     } catch (IllegalArgumentException e) {
       log.error("JWT claims string is empty: {}", e.getMessage());
     }
@@ -88,5 +93,24 @@ public class JwtHelper {
       return time + jwtAccessTokenExpirationMs;
     }
     return time + jwtRefreshTokenExpirationMs;
+  }
+
+  public Claims getClaims(TokenType tokenType, String authToken) {
+    Claims claims = null;
+    try {
+      claims = Jwts.parserBuilder()
+              .setSigningKey(key(tokenType))
+              .build().parseClaimsJws(authToken)
+              .getBody();
+    } catch (MalformedJwtException e) {
+      log.error("Invalid JWT token: {}", e.getMessage());
+    } catch (ExpiredJwtException e) {
+      log.error("JWT token is expired: {}", e.getMessage());
+    } catch (UnsupportedJwtException e) {
+      log.error("JWT token is unsupported: {}", e.getMessage());
+    } catch (IllegalArgumentException e) {
+      log.error("JWT claims string is empty: {}", e.getMessage());
+    }
+    return claims;
   }
 }

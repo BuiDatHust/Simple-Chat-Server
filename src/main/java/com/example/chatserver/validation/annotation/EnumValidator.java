@@ -1,4 +1,5 @@
-package com.example.chatserver.validation;
+package com.example.chatserver.validation.annotation;
+import com.example.chatserver.validation.EnumValidatorImpl;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import jakarta.validation.ReportAsSingleViolation;
