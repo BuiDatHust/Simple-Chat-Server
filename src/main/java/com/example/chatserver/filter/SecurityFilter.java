@@ -20,7 +20,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.annotation.Order;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -33,7 +33,6 @@ import java.util.*;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@Order(5)
 public class SecurityFilter extends OncePerRequestFilter {
     private final JwtHelper jwtHelper;
     private List<String> excludeUrlPatterns = new ArrayList<>(List.of(
@@ -46,9 +45,9 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        log.info("doFilterInternal() : {}");
         ContentCachingRequestWrapper requestWrapper = new ContentCachingRequestWrapper(request);
         ContentCachingResponseWrapper responseWrapper = new ContentCachingResponseWrapper(response);
-        filterChain.doFilter(request,response);
 
         String authorization = requestWrapper.getHeader("Authorization");
         if (authorization == null || !authorization.startsWith("Bearer ")) {
@@ -71,8 +70,7 @@ public class SecurityFilter extends OncePerRequestFilter {
             requestWrapper.setAttribute(TokenParams.userId, claims.get(TokenParams.userId, Long.class));
             requestWrapper.setAttribute(TokenParams.tokenType, claims.get(TokenParams.tokenType, String.class));
             requestWrapper.setAttribute(TokenParams.deviceName, claims.get(TokenParams.deviceName, String.class));
-//                filterChain.doFilter(requestWrapper, responseWrapper);
-//                responseWrapper.copyBodyToResponse();
+            filterChain.doFilter(requestWrapper, responseWrapper);
         } catch (ExpiredJwtException e) {
             log.info("Exception token expire");
             sendError(responseWrapper, ResponseStatusCodeEnum.FORBIDDEN_TOKEN_INVALID.getCode());

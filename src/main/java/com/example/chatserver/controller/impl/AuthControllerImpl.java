@@ -8,6 +8,8 @@ import com.example.chatserver.service.auth.dto.response.LogoutResponseDto;
 import com.example.chatserver.service.otp.dto.request.LogoutDataDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +26,7 @@ import com.example.chatserver.service.auth.dto.response.RegisterByPhoneResponseD
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
 @RestController
+@Slf4j
 public class AuthControllerImpl implements AuthOperation {
     private final AuthService authService;
 
@@ -46,13 +49,13 @@ public class AuthControllerImpl implements AuthOperation {
 
     @Override
     public ResponseEntity<GeneralResponse<LogoutResponseDto>> logout(LogoutRequestDto logoutRequestDto, HttpServletRequest request) {
+        log.info("logout, {}", logoutRequestDto);
+
         LogoutDataDto logoutDataDto = LogoutDataDto.builder()
                 .phoneNumber((String) request.getAttribute(TokenParams.phoneNumber))
                 .deviveName((String) request.getAttribute(TokenParams.deviceName))
                 .userId((Long) request.getAttribute(TokenParams.userId))
                 .build();
-        ContentCachingRequestWrapper requestWrapper = new ContentCachingRequestWrapper(request);
-        System.out.println(requestWrapper.getAttribute("phoneNumber"));
         return responseFactory.success(authService.logout(logoutDataDto));
     }
 }

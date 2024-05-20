@@ -3,9 +3,14 @@ package com.example.chatserver.service.otp;
 import java.util.Date;
 import java.util.Objects;
 
+import com.example.chatserver.entity.Chat;
+import com.example.chatserver.entity.ChatMember;
 import com.example.chatserver.entity.LoginDevice;
+import com.example.chatserver.entity.Message;
 import com.example.chatserver.entity.RefreshToken;
 import com.example.chatserver.entity.enums.LoginDeviceStatusEnum;
+import com.example.chatserver.entity.enums.TypeChatEnum;
+import com.example.chatserver.entity.enums.TypeContentMessageEnum;
 import com.example.chatserver.framework.InmemoryDatabaseFramework;
 import com.example.chatserver.helper.datetime.DateTimeHelper;
 import com.example.chatserver.helper.jwt.JwtHelper;
@@ -25,7 +30,9 @@ import org.springframework.stereotype.Service;
 
 import com.example.chatserver.entity.Otp;
 import com.example.chatserver.entity.User;
+import com.example.chatserver.entity.UserSetting;
 import com.example.chatserver.entity.enums.TypeOtpEnum;
+import com.example.chatserver.entity.enums.UiModeEnum;
 import com.example.chatserver.entity.enums.UserChatStatusEnum;
 import com.example.chatserver.exception.BaseException;
 import com.example.chatserver.framework.SmsFramework;
@@ -215,5 +222,28 @@ public class OtpServiceImpl implements OtpService {
                 .recipent(resendOtpRequestDto.getPhoneNumber())
                 .build();
         sendOtp(sendOtpRequestDto);
+    }
+
+    private void initDataNewUser(User user) {
+        UserSetting userSetting = UserSetting.builder()
+            .uiMode(UiModeEnum.WHITE)
+            .createdDate(DateTimeHelper.getCurrentTimeUtcMs())
+            .build();
+        Chat chat = Chat.builder()
+            .avatar("default")
+            .description("This is system chat")
+            .name("system_chat-" + user.getPhoneNumber())
+            .maxMember(2)
+            .typeChat(TypeChatEnum.SYSTEM)
+            .chatMembers(null)
+            .createdDate(DateTimeHelper.getCurrentTimeUtcMs())
+            .build();
+        ChatMember chatMember = ChatMember.builder()
+            .build();
+        Message message = Message.builder()
+            .content("Hi, welcome to simple-chat-server! This system message.")
+            .contentType(TypeContentMessageEnum.TEXT)
+            .createdDate(DateTimeHelper.getCurrentTimeUtcMs())
+            .build();
     }
 }

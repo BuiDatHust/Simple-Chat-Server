@@ -96,6 +96,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public LogoutResponseDto logout(LogoutDataDto logoutDataDto) {
         LoginDevice loginDevice = loginDeviceRepository.findOneLoginDeviceByNameAndUserId(logoutDataDto.getDeviveName(), logoutDataDto.getUserId());
         if(Objects.isNull(loginDevice)) {
