@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Client</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
+</head>
+<body>
+<script>
+    const socket = new SockJS('/ws');
+    const stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function (frame) {
+        console.log('Connected: ' + frame);
+
+        // Subscribe to event B
+        stompClient.subscribe('/topic/eventB', function (message) {
+            console.log('Received message on event B: ', message.body);
+        });
+
+        // Send a message to event A
+        stompClient.send('/app/eventA', {}, 'Hello, Server!');
+    });
+
+    stompClient.onclose = function (event) {
+        console.log('WebSocket connection closed.');
+    };
+
+    stompClient.onerror = function (error) {
+        console.log('WebSocket error: ', error);
+    };
+</script>
+</body>
+</html>

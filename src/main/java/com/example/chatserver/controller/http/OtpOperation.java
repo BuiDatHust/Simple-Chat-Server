@@ -1,4 +1,4 @@
-package com.example.chatserver.controller;
+package com.example.chatserver.controller.http;
 
 import com.example.chatserver.service.otp.dto.request.CheckLoginOtpRequestDto;
 import com.example.chatserver.service.otp.dto.request.ResendOtpRequestDto;

@@ -1,4 +1,4 @@
-package com.example.chatserver.controller.impl;
+package com.example.chatserver.controller.http.impl;
 
 import com.example.chatserver.service.otp.dto.request.CheckLoginOtpRequestDto;
 import com.example.chatserver.service.otp.dto.request.ResendOtpRequestDto;
@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.chatserver.controller.OtpOperation;
+import com.example.chatserver.controller.http.OtpOperation;
 import com.example.chatserver.helper.response.GeneralResponse;
 import com.example.chatserver.helper.response.ResponseFactory;
 import com.example.chatserver.service.otp.OtpService;

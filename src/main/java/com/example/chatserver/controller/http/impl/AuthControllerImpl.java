@@ -1,4 +1,4 @@
-package com.example.chatserver.controller.impl;
+package com.example.chatserver.controller.http.impl;
 
 import com.example.chatserver.constant.TokenParams;
 import com.example.chatserver.service.auth.dto.request.LoginRequestDto;
@@ -10,20 +10,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.chatserver.controller.AuthOperation;
+import com.example.chatserver.controller.http.AuthOperation;
 import com.example.chatserver.helper.response.GeneralResponse;
 import com.example.chatserver.helper.response.ResponseFactory;
 import com.example.chatserver.service.auth.AuthService;
 import com.example.chatserver.service.auth.dto.request.RegisterByPhoneRequestDto;
 import com.example.chatserver.service.auth.dto.response.RegisterByPhoneResponseDto;
-import org.springframework.web.util.ContentCachingRequestWrapper;
 
 @RestController
 @Slf4j

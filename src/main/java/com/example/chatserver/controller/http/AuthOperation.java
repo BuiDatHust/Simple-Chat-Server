@@ -1,4 +1,4 @@
-package com.example.chatserver.controller;
+package com.example.chatserver.controller.http;
 
 import com.example.chatserver.service.auth.dto.request.LoginRequestDto;
 import com.example.chatserver.service.auth.dto.request.LogoutRequestDto;

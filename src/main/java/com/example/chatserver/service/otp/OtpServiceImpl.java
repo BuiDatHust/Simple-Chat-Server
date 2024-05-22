@@ -1,13 +1,11 @@
 package com.example.chatserver.service.otp;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
-import com.example.chatserver.entity.Chat;
-import com.example.chatserver.entity.ChatMember;
-import com.example.chatserver.entity.LoginDevice;
-import com.example.chatserver.entity.Message;
-import com.example.chatserver.entity.RefreshToken;
+import com.example.chatserver.entity.*;
 import com.example.chatserver.entity.enums.LoginDeviceStatusEnum;
 import com.example.chatserver.entity.enums.TypeChatEnum;
 import com.example.chatserver.entity.enums.TypeContentMessageEnum;
@@ -15,22 +13,23 @@ import com.example.chatserver.framework.InmemoryDatabaseFramework;
 import com.example.chatserver.helper.datetime.DateTimeHelper;
 import com.example.chatserver.helper.jwt.JwtHelper;
 import com.example.chatserver.helper.jwt.TokenGenrationData;
-import com.example.chatserver.repository.LoginDeviceRepository;
-import com.example.chatserver.repository.RefreshTokenRepository;
+import com.example.chatserver.repository.*;
 import com.example.chatserver.service.auth.enums.TokenType;
+import com.example.chatserver.service.chat.ChatService;
+import com.example.chatserver.service.chat.dto.InitChatData;
 import com.example.chatserver.service.otp.dto.request.CheckLoginOtpRequestDto;
 import com.example.chatserver.service.otp.dto.request.ResendOtpRequestDto;
 import com.example.chatserver.service.otp.dto.response.CheckLoginOtpResponseDto;
 
 import jakarta.transaction.Transactional;
 
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import com.example.chatserver.entity.Otp;
-import com.example.chatserver.entity.User;
-import com.example.chatserver.entity.UserSetting;
 import com.example.chatserver.entity.enums.TypeOtpEnum;
 import com.example.chatserver.entity.enums.UiModeEnum;
 import com.example.chatserver.entity.enums.UserChatStatusEnum;
@@ -38,8 +37,6 @@ import com.example.chatserver.exception.BaseException;
 import com.example.chatserver.framework.SmsFramework;
 import com.example.chatserver.helper.GenerateOTP;
 import com.example.chatserver.helper.response.ResponseStatusCodeEnum;
-import com.example.chatserver.repository.OtpRepository;
-import com.example.chatserver.repository.UserRepository;
 import com.example.chatserver.service.otp.dto.request.CheckRegisterOtpRequestDto;
 import com.example.chatserver.service.otp.dto.request.SendOtpRequestDto;
 
@@ -47,6 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class OtpServiceImpl implements OtpService {
     private final OtpRepository otpRepository; ;
     private final SmsFramework twilioFramework;
@@ -55,21 +53,14 @@ public class OtpServiceImpl implements OtpService {
     private final LoginDeviceRepository loginDeviceRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final InmemoryDatabaseFramework inmemoryDatabaseFramework;
+    private final ChatService chatService;
+    private final MessageRepository messageRepository;
+    private final UserSettingRepository userSettingRepository;
 
     @Value("${otp.expire-time}")
     private Integer otpExpireTime;
 
     private static String REFRESH_TOKEN_CACHE_TEMPLATE = "RefreshToken_%s_%s";
-
-    public OtpServiceImpl(OtpRepository otpRepository, SmsFramework twilioFramework, UserRepository userRepository, JwtHelper jwtHelper, LoginDeviceRepository loginDeviceRepository, RefreshTokenRepository refreshTokenRepository, RedisTemplate redisTemplate, InmemoryDatabaseFramework inmemoryDatabaseFramework) {
-        this.otpRepository = otpRepository;
-        this.twilioFramework = twilioFramework;
-        this.userRepository = userRepository;
-        this.jwtHelper = jwtHelper;
-        this.loginDeviceRepository = loginDeviceRepository;
-        this.refreshTokenRepository = refreshTokenRepository;
-        this.inmemoryDatabaseFramework = inmemoryDatabaseFramework;
-    }
 
     @Override
     public void sendOtp(SendOtpRequestDto sendOtpRequestDto) {
@@ -136,6 +127,7 @@ public class OtpServiceImpl implements OtpService {
 
         existedUser.setStatus(UserChatStatusEnum.PENDING_ONBOARDING);
         userRepository.save(existedUser);
+        initDataNewUser(existedUser);
         existedOtp.setActive(false);
         otpRepository.save(existedOtp);
         return true;
@@ -229,21 +221,21 @@ public class OtpServiceImpl implements OtpService {
             .uiMode(UiModeEnum.WHITE)
             .createdDate(DateTimeHelper.getCurrentTimeUtcMs())
             .build();
-        Chat chat = Chat.builder()
-            .avatar("default")
-            .description("This is system chat")
-            .name("system_chat-" + user.getPhoneNumber())
-            .maxMember(2)
-            .typeChat(TypeChatEnum.SYSTEM)
-            .chatMembers(null)
-            .createdDate(DateTimeHelper.getCurrentTimeUtcMs())
-            .build();
-        ChatMember chatMember = ChatMember.builder()
-            .build();
+        userSettingRepository.save(userSetting);
+
+        InitChatData initChatData = InitChatData.builder()
+                .users(new ArrayList<>(List.of(user)))
+                .avatar("default")
+                .typeChatEnum(TypeChatEnum.SYSTEM)
+                .name("System_Chat_"+user.getPhoneNumber())
+                .description("This is system message")
+                .build();
+        Chat chat = chatService.initChat(initChatData);
         Message message = Message.builder()
             .content("Hi, welcome to simple-chat-server! This system message.")
-            .contentType(TypeContentMessageEnum.TEXT)
+            .contentType(TypeContentMessageEnum.TEXT).chat(chat)
             .createdDate(DateTimeHelper.getCurrentTimeUtcMs())
             .build();
+        messageRepository.save(message);
     }
 }
